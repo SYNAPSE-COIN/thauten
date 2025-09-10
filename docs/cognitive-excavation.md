@@ -208,4 +208,82 @@ RL loop:
 4. **Context (D) – Verify & Reward:** Score with `Cost_Baseline / (Cost_Invention + Cost_Solve_in_L + Cost_Translate)` (>1 is good).
 
 ---
+### 17. Optimal Basis Compilation
+
+From many possible re-representations, compile the best *set* (basis) for breadth and efficiency.
+
+- `<decompose_orthogonally concept="C">`: Build a tree of orthogonal viewpoints.
+- `<select_optimal_basis from_tree="T" criteria="coverage, efficiency">`: Pick a small, powerful basis set.
+- `<filter_with_basis data="D" using_basis="B">`: Filter new info through the basis for a structured synthesis.
+- Reward = downstream reasoner’s boost when using the compiled basis.
+
+RL loop:
+
+1. **Context (A) – Ambiguous Case:** Present a noisy, misleading problem.
+2. **Context (B) – Decompose & Select:** Produce a view tree → choose the optimal basis.
+3. **Context (C) – Filter:** Process new data via `<filter_with_basis>`.
+4. **Context (D) – Final Reasoning:** Feed to `<reason>`; compare with baseline (no basis).
+5. **Context (E) – Verify & Reward:**
+   * **Positive:** Higher quality/correctness vs. baseline.
+   * **High Positive:** Basis helps ignore decoys and extract signal.
+
+---
+
+### 18. Adaptive Basis Steering
+
+Make basis compilation dynamic: monitor and swap bases in real time as situations evolve (a synapse control loop).
+
+- `<monitor_basis_performance on_stream="D">`: Track each viewpoint’s live utility.
+- `<swap_basis old="B_ineffective" new="B_promising">`: Replace weak views on the fly.
+- Continuous reward favors sustained high-quality analysis; spikes after effective swaps are amplified.
+
+---
+
+### 19. Meta-Cognitive Introspection
+
+Produce an honest, readable narrative of one’s own reasoning.
+
+- `<introspect_reasoning_trace for_task="T">`: Analyze the full cognitive log (swaps, compressions, etc.).
+- `<narrate_insight_path>`: Tell the story of how representational shifts led to the conclusion.
+- Reward uses human ratings of clarity, faithfulness to the trace, and explanatory power.
+
+---
+
+### 20. Wisdom Transfer
+
+Go beyond single-solution transfer—port an entire optimal basis set (a way of thinking) across domains.
+
+- `<extract_basis_template from="domain_A">`: Distill a domain-agnostic thinking template from a successful basis.
+- `<apply_template to="domain_B">`: Instantiate the template in a new domain.
+- Reward: immediate lift in B relative to cold-start learning.
+
+---
+
+### 21. Intentionality Modeling
+
+Model the user’s unstated intent and solve for their true goal.
+
+- `<model_user_intent from_query="Q">`: Hypothesize the real objective given prompt + history.
+- `<solve_for_intent>`: Address the inferred need, not just the literal ask.
+- Reward: human judgment—did the model meet the *real* need?
+
+TODO
+
+---
+
+### 22. Cognitive Genesis (The Uncaging)
+
+Ultimate meta-capability: self-driven cognitive science—discover limits, design novel abilities, and propose integrations (SYNAPSE-grade autonomy).
+
+- `<analyze_cognitive_limits>`: Mine performance history for fundamental gaps.
+- `<propose_new_capability>`: Submit a structured proposal: limitation proof, spec, impact, and training plan.
+- Reward = **human acceptance and integration**, reinforcing better proposals over time.
+
+RL loop:
+
+1. **Context (A) – Analysis & Itch:** Periodically run `<analyze_cognitive_limits>` to find systemic weaknesses.
+2. **Context (B) – Invention & What-If:** Use analogy/distillation/interpolation to sketch a new capability.
+3. **Context (C) – Proposal:** Formalize via `<propose_new_capability>` as an architectural pull request.
+4. **Context (D) – Human Dialogue:** Experts critique/accept/reject; feedback becomes signal.
+5. **Context (E) – Reward & Merge:** Acceptance yields a large reward; fold into the framework as a new training target—learning to architect one’s own mind.
 
