@@ -187,3 +187,168 @@ def test_build_obj_span():
             ],
         ),
         (
+
+            "text <|o_o|> text",
+            [
+                {"type": EgoSpan, "attrs": {"ego": "system"}},
+                {"type": TextSpan, "attrs": {"text": "text "}},
+                {"type": EgoSpan, "attrs": {"ego": "user"}},
+                {"type": TextSpan, "attrs": {"text": "text"}},
+            ],
+        ),
+        # Do not duplicate consecutive ego spans
+        ("<|o_o|><|o_o|>", [{"type": EgoSpan, "attrs": {"ego": "user"}}]),
+        ("<|+++|>", [{"type": ContextResetSpan, "attrs": {"train": True}}]),
+        ("<|===|>", [{"type": ContextResetSpan, "attrs": {"train": False}}]),
+        (
+            "<|o_o|><|MyClass|>",
+            [
+                {"type": EgoSpan, "attrs": {"ego": "user"}},
+                {"type": ClassSpan, "attrs": {"class_name": "MyClass"}},
+            ],
+        ),
+        (
+            "<|@_@|><|my_obj|>",
+            [
+                {"type": EgoSpan, "attrs": {"ego": "assistant"}},
+                {"type": ObjSpan, "attrs": {"var_ids": ["my_obj"]}},
+            ],
+        ),
+        (
+            "<|@_@|><|obj1|obj2|>",
+            [
+                {"type": EgoSpan, "attrs": {"ego": "assistant"}},
+                {"type": ObjSpan, "attrs": {"var_ids": ["obj1", "obj2"]}},
+            ],
+        ),
+        (
+            "<|@_@ goal=run|>",
+            [
+                {"type": EgoSpan, "attrs": {"ego": "assistant"}},
+                {"type": SampleSpan, "attrs": {"goal": "run"}},
+            ],
+        ),
+    ],
+)
+def test_synapse_parser_basic(code, expected_details):
+    spans = SynapseParser(code).parse().spans
+    assert len(spans) == len(expected_details)
+    for i, details in enumerate(expected_details):
+        span = spans[i]
+        assert isinstance(span, details["type"])
+        if "attrs" in details:
+            for attr, value in details["attrs"].items():
+                assert getattr(span, attr) == value
+
+def test_parser_implicit_system_ego():
+    synware = SynapseParser("some text").parse()
+    assert len(synware.spans) == 2
+    assert isinstance(synware.spans[0], EgoSpan)
+    assert synware.spans[0].ego == "system"
+    assert isinstance(synware.spans[1], TextSpan)
+    assert synware.spans[1].text == "some text"
+
+def test_parser_context_reset_clears_ego():
+    code = "<|o_o|>hello<|+++|>world"
+    synware = SynapseParser(code).parse()
+    # Expected: Ego(user), Text(hello), Reset, Ego(system), Text(world)
+    assert len(synware.spans) == 5
+    assert isinstance(synware.spans[0], EgoSpan)
+    assert synware.spans[0].ego == "user"
+    assert isinstance(synware.spans[2], ContextResetSpan)
+    assert isinstance(synware.spans[3], EgoSpan)
+    assert synware.spans[3].ego == "system"
+    assert isinstance(synware.spans[4], TextSpan)
+    assert synware.spans[4].text == "world"
+
+def test_parser_span_before_ego_raises_error():
+    with pytest.raises(ValueError):
+        SynapseParser("<|MyClass|>").parse()
+    with pytest.raises(ValueError):
+        SynapseParser("<|my_obj|>").parse()
+    with pytest.raises(ValueError):
+        # SampleSpan is created with EgoSpan, so this is nuanced:
+        # The constraint applies to SampleSpan, ObjSpan, ClassSpan
+        # This input <|goal=run|> will be parsed as an ObjSpan
+        SynapseParser("<|goal=run|>").parse()
+
+def test_parser_unclosed_tag_raises_error():
+    with pytest.raises(ValueError, match="Unclosed tag"):
+        SynapseParser("<|o_o").parse()
+
+def test_parser_merges_consecutive_text_spans():
+    # Covered implicitly elsewhere, but made explicit here.
+    # Parser merges adjacent text spans under the same ego.
+    code = "<|o_o|>one two three"
+    synware = SynapseParser(code).parse()
+    assert len(synware.spans) == 2
+    assert isinstance(synware.spans[1], TextSpan)
+    assert synware.spans[1].text == "one two three"
+
+def test_parser_handles_whitespace():
+    code = "  <|o_o|>  \n  text  "
+    synware = SynapseParser(code).parse()
+    # Expected: Ego(user), Text(text  )
+    # Leading whitespace before first tag is ignored.
+    # Leading whitespace after a tag is stripped.
+    # Trailing whitespace in text is preserved.
+    assert len(synware.spans) == 2
+    assert isinstance(synware.spans[0], EgoSpan)
+    assert isinstance(synware.spans[1], TextSpan)
+    assert synware.spans[1].text == "text  "
+
+def test_parser_indented_block_simple():
+    code = """<|o_o|>
+<|MyClass|>
+    Some indented text.
+"""
+    synware = SynapseParser(code).parse()
+    assert len(synware.spans) == 2
+    class_span = synware.spans[1]
+    assert isinstance(class_span, ClassSpan)
+    assert class_span.class_name == "MyClass"
+    assert class_span.body is not None
+
+    body = class_span.body
+    assert body is not None
+    assert len(body.spans) == 2  # system ego + text
+    assert isinstance(body.spans[0], EgoSpan) and body.spans[0].ego == "system"
+    assert isinstance(body.spans[1], TextSpan)
+    assert body.spans[1].text == "Some indented text."
+
+def test_parser_indented_block_complex():
+    code = """<|o_o|>
+<|Container|>
+    <|@_@|>
+    <|Item|>
+        Nested item
+"""
+    synware = SynapseParser(code).parse()
+    container_span = synware.spans[1]
+    assert isinstance(container_span, ClassSpan)
+    assert container_span.class_name == "Container"
+
+    body = container_span.body
+    assert body is not None
+    assert len(body.spans) == 2  # assistant ego, Item class
+    assert isinstance(body.spans[0], EgoSpan) and body.spans[0].ego == "assistant"
+
+    item_span = body.spans[1]
+    assert isinstance(item_span, ClassSpan) and item_span.class_name == "Item"
+
+    nested_body = item_span.body
+    assert nested_body is not None
+    assert len(nested_body.spans) == 2  # system ego, text
+    assert isinstance(nested_body.spans[1], TextSpan)
+    assert nested_body.spans[1].text == "Nested item"
+
+def test_parser_indented_block_no_block():
+    code = "<|o_o|><|MyClass|>\nNot indented."
+    synware = SynapseParser(code).parse()
+    assert len(synware.spans) == 3
+    class_span = synware.spans[1]
+    assert isinstance(class_span, ClassSpan)
+    assert class_span.body is None
+    text_span = synware.spans[2]
+    assert isinstance(text_span, TextSpan)
+    assert text_span.text == "Not indented."
