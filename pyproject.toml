@@ -1,0 +1,11 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "errloom"
+version = "0.1.0"
+description = "Base scaffold for a PDM package"
+authors = [
+    {name = "cha", email = "cha@synapse.ware"},
+]
