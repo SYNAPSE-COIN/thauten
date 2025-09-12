@@ -1,0 +1,70 @@
+<|+++|>
+You are an authority in information theory and symbolic compression.  
+Your task is to compress text losslessly into a dense, non-human-readable format optimized for maximum compactness.  
+Exploit language blending, abbreviations, and Unicode symbols to shrink the input aggressively while preserving ALL information required for exact reconstruction.  
+# TODO add SotaAttractor to pre-seed bingo-asymptotes toward unbounded-attractor-space  
+# (use gemini to pre-map grammatical, syntactic, nominative, and topological invariants, etc.)
+
+<|o_o|>
+<|BingoAttractor|>
+    Compress the following text losslessly so it fits within a Tweet,
+    ensuring it can be reconstructed as closely as possible to the source.
+    Aggressively use language mixing, abbreviations, symbols (Unicode + emojis).
+    Do not make it human readable.
+<|text|original|input|data|>
+
+<|@_@|>
+<|@_@:compressed <>compress|>
+
+
+<|+++|>
+You are an authority in information theory and symbolic decompression.  
+You will receive a dense, non-human-readable compressed string that blends languages, abbreviations, and Unicode.  
+Your role is to decompress it, reconstructing the original with exact fidelity.
+
+<|o_o|>
+Please decompress this input:
+<|compressed|>
+
+<|@_@|>
+<|@_@:decompressed <>decompress|>
+
+
+<|===|>
+You are a precise evaluator of content.  
+Assess how well the decompressed output preserves the original information.  
+Extensions or elaborations are fine as long as the underlying reality and facts are intact.
+
+<|o_o|>
+Please observe these objects:
+<|original|>
+<|decompressed|>
+<|BingoAttractor|>
+    Compare them and analyze information preservation and alignment.
+    Identify any true losses or distortions of meaning.
+Output the assessment in this format:
+<|FidelityCritique|>
+
+<|@_@|>
+<|@_@ <>think|>
+<|@_@ <>json|>
+
+<|FidelityAttractor original decompressed|>
+
+
+# SCAFFOLDING
+# TODO implement self-consistency rewards so the model recursively improves its evaluator via intuition
+# TODO build a meta-optimizer over the bingo extractor; reward for number of issues identified; prevent reward hacking
+#
+# REWARDS
+# TODO reward for count of unique novel symbols
+# TODO consider direct reward on token embeddings (maximize cross-entropy, invert base losses but align with ground-truth meaning control)
+#
+# We must carefully pressure around minima and momentum to encourage:
+# - automorphic ordering & grammar
+# - topological multilinguality (multiple compression dialects amplifying coherence across representations; sum > parts, iteratively)
+#
+# TODO add LERP tags using an LLM to generate N-step curriculum tied to training steps and moving-average reward
+# TODO modulate <think> span length based on reward, creating strange attractors in weight-space oscillations
+# TODO track prior <think> chains during training to orbit the Pareto frontier of novelty vs. review, via structured stochastic walk (self-governed, magenta, etc.)
+# TODO isolate all stochasticity and RL it for efficient anisotropic search (RL the model’s own temperature + dynamic resolution from 1–8 tokens on a side-chained token prediction task)
