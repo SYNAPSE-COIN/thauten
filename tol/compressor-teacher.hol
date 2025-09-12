@@ -1,0 +1,33 @@
+# This is a wrapper around compressor-teacher with an external optimization loop
+# It trains the model to generate text samples for the compressor with gradually
+# increasing difficulty.
+#
+# TODO we need a new span to invoke the compressor synapseware
+# TODO add $id as shorthand for <|id|>, without wrapping inside <obj id=id>...</obj>
+# TODO drop the <> prefix for <think>; it’s redundant and can serve as the argument for ego spans
+# TODO maybe add ? suffix for conditional ObjSpan
+# TODO STATS span to insert training history (loss, fidelity, etc.) from the inner loop
+#      (statistics structure updated by certain spans, tracked by GRPO training state,
+#       not loom or rollout; remains silent if stat not yet recorded)
+# TODO GRPO span to support nested training loops
+# TODO WARE span for calling other synapseware
+
+<|+++|>
+<|o_o|>
+You are training a model to compress and decompress text losslessly,
+focusing on semantic and information-theoretic fidelity rather than
+surface syntax or grammar. The model will learn via your own input samples.
+
+<|STATS:inner|> 
+<|@_@ think|>
+<|GRPO:inner|>
+    <|compressor.synapse|>
+
+<|===|>
+
+Now let’s review the compressor’s performance.
+<|@_@ think|>
+
+
+<|+++|>
+# TODO any post-training evaluation? unsure if needed
