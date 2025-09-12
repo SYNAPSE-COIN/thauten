@@ -1,0 +1,83 @@
+# ----------------------------------------------------------------------------------
+# Meta-Cognitive Architect: A Multi-Level Self-Adaptation Synapseware
+#
+# This is an experimental synapseware that extends the SEAL concept
+# to a higher level of abstraction. The model learns to refine the *process*
+# of creating specialized cognitive operators.
+#
+# Level 1: The model solves a task.
+# Level 2: The model generates finetuning data for a specialized operator.
+# Level 3: The model designs a *strategy* for producing better Level 2 data.
+#
+# The reward is applied to the Level 3 strategy, based on the quality of the
+# Level 2 operator it enables. This is a thought experiment in recursive
+# self-improvement.
+# ----------------------------------------------------------------------------------
+
+# === Context 1 (L1): Baseline Performance ===
+<|===|>
+<|SYS|>You are a general problem-solver.
+<|USER|>
+<|USER GOAL=Solve the following task using the general `<think>` operator.|>
+<|problem_description|>
+<|SYNAPSE|>
+<|SYNAPSE:baseline_solution <>think|>
+
+# === Context 2 (L3): Propose a Specialization STRATEGY ===
+# This is the meta-meta action. The model does not generate data, but a policy
+# for how to generate data.
+<|===|>
+<|SYS|>You are a Meta-Cognitive Architect. Your task is to design an improved learning strategy.
+<|USER|>
+Observe the baseline solution. Now, propose a strategy for creating a specialized operator.
+<|USER GOAL=Produce a detailed prompt template (`specialization_strategy_prompt`) that will be used to build a finetuning dataset for a `<think_specialist>` operator. This strategy should guide the model to create the strongest possible training examples.|>
+<|SYNAPSE|>
+<|SYNAPSE:specialization_strategy_prompt <>strategy_definition|>
+
+# === Context 3 (L2): Generate Self-Edit using the L3 Strategy ===
+# The model now executes its own strategy from the previous step.
+<|===|>
+<|SYS|>You are a data generation expert. Follow the provided strategy precisely.
+<|USER|>
+<|USER GOAL=Using the `specialization_strategy_prompt` you just defined, generate the actual finetuning dataset.|>
+Your Strategy Prompt:
+<|specialization_strategy_prompt|>
+
+Original Problem:
+<|problem_description|>
+<|SYNAPSE|>
+<|SYNAPSE:specialization_data <>json|>
+
+# === Context 4 (L1): Evaluate the Resulting Specialist ===
+<|===|>
+<|SYS|>You are a new, specialized reasoning agent.
+<|USER|>
+<|USER GOAL=Solve this new, similar task using your specialized `<think_specialist>` operator.|>
+<|new_problem_description|>
+<|SYNAPSE|>
+<|SYNAPSE:specialized_solution <>think_specialist|>
+
+# === Context 5 (L3): Final Reward Calculation ===
+<|===|>
+<|SYS|>You are a precise, automated meta-reward calculation engine.
+<|USER|>
+**1. Assess Correctness:**
+Set `correctness_score` = 1 if `specialized_solution` is correct, else 0.
+
+**2. Calculate Reward for the L3 Strategy:**
+The reward reflects the quality of the L1 operator created via the L2 data, which was guided by the L3 strategy.
+
+Token Counts:
+- baseline_reasoning_tokens: <|baseline_reasoning_tokens|>
+- specialized_reasoning_tokens: <|specialized_reasoning_tokens|>
+
+<|USER GOAL=
+Steps:
+1.  Assign `correctness_score` (0 or 1).
+2.  If `correctness_score` = 0 → strategy failed: `final_reward` = -1.0.
+3.  If `correctness_score` = 1 → compute `final_reward` as token efficiency gain: (`baseline_reasoning_tokens` - `specialized_reasoning_tokens`) / `baseline_reasoning_tokens`.
+4.  This `final_reward` is attributed to the `specialization_strategy_prompt` from Context 2.
+5.  Output a single raw JSON object with `correctness_score` and `final_reward`.
+|>
+<|SYNAPSE|>
+<|SYNAPSE <>json|>
