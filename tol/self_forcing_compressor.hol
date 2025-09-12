@@ -1,0 +1,88 @@
+# ----------------------------------------------------------------------------------
+# Self-Forcing Compressor
+#
+# This synapseware applies the "Self Forcing" principle to the compression task.
+# The model is required to learn from its own mistakes by producing an initial
+# compression, critiquing it, and then generating a refined version.
+#
+# The RLHF loop is:
+# 1. The model creates an initial compression attempt (v1).
+# 2. The model audits its v1 compression, identifies weaknesses, and produces
+#    an improved compression (v2).
+# 3. The refined v2 compression is decompressed.
+# 4. The reward is calculated from correctness and, critically, the
+#    *efficiency improvement* from v1 to v2. This directly incentivizes
+#    self-correction.
+# ----------------------------------------------------------------------------------
+
+# === Context 1: Initial Compression Attempt ===
+<|===|>
+
+<|SYS|>You are an expert in information theory. Perform a lossless text compression that is as compact as possible.
+<|USER|>
+<|USER GOAL=Compress the following text. This is your first attempt.|>
+<|original|>
+<|SYNAPSE|>
+<|SYNAPSE:compressed_v1 <>compress_v1|>
+
+# === Context 2: Self-Audit and Refinement ===
+<|===|>
+
+<|SYS|>You are a rigorous self-auditor. Examine your first compression for flaws, ambiguities, or inefficiencies. Then produce a more compact, corrected version.
+<|USER|>
+Here is the original text and your first attempt (`compressed_v1`).
+Original:
+<|original|>
+
+First Attempt (`compressed_v1`):
+<|compressed_v1|>
+
+<|USER GOAL=First, think through the weaknesses of `compressed_v1`. Identify lost or ambiguous details and possible efficiency gains. Then create a refined `compressed_v2` that fixes these issues.|>
+<|SYNAPSE|>
+<|SYNAPSE:critique <>think|>
+<|SYNAPSE:compressed_v2 <>compress_v2|>
+
+# === Context 3: Final Decompression ===
+<|===|>
+
+<|SYS|>You are an expert decompressor. Given a dense, non-human-readable compressed text, restore the original content with perfect fidelity.
+<|USER|>
+<|USER GOAL=Please decompress this text.|>
+<|compressed_v2|>
+<|SYNAPSE|>
+<|SYNAPSE:decompressed_final <>decompress_final|>
+
+# === Context 4: Verification & Reward Calculation ===
+<|===|>
+
+<|SYS|>You are an automated reward evaluator. Assess the self-correction loop and output a structured JSON reward.
+<|USER|>
+**1. Assess Correctness:**
+Compare the original with the final decompressed version. `correctness_score` = 1 if semantically identical, else 0.
+
+Original Text:
+<|original|>
+
+Final Decompressed Text:
+<|decompressed_final|>
+
+**2. Compute Reward:**
+Reward depends on improvement from v1 to v2. Token counts are provided:
+
+Token Counts:
+- original_tokens: <|original_tokens|>
+- v1_compressed_tokens: <|v1_compressed_tokens|>
+- v2_compressed_tokens: <|v2_compressed_tokens|>
+
+<|USER GOAL=
+Steps:
+1. Set `correctness_score` (0 or 1).
+2. If `correctness_score` = 0 → `final_reward` = -1.0.
+3. If `correctness_score` = 1:
+    a. Compute `efficiency_v1` = original_tokens / v1_compressed_tokens.
+    b. Compute `efficiency_v2` = original_tokens / v2_compressed_tokens.
+    c. Compute `final_reward` = efficiency_v2 - efficiency_v1.
+4. Output a single raw JSON object containing: `correctness_score`, `efficiency_v1`, `efficiency_v2`, and `final_reward`.
+|>
+<|SYNAPSE|>
+<|SYNAPSE <>json|>
