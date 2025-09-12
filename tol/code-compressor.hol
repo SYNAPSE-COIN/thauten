@@ -1,0 +1,97 @@
+# TODO build a code compressor layered atop compressor.synapse
+#
+# This variant needs a multi-turn loop in the evaluator,
+# because it has to investigate the target codebase first.
+# We sample a random repository and ask pointed questions about logic, architecture, etc.
+# The compressor is pushed to discover the grammar and topology that best capture
+# the codebase’s essence with minimal loss across dimensions:
+# - syntax
+# - semantics
+# - logic
+# - corner cases
+# - architecture
+# - abstractions
+# - implementation details
+# - domain details
+# - practices & standards
+#
+# We can further refine the focus for maximum practical value.
+# We tie this to some swebenchmaxxing synapseware and steer the
+# dimensional emphasis toward maximizing usefulness for coding tasks.
+# The resulting model is not merely benchmark-maxxed; it’s grown along
+# a different axis such that it implies strong benchmark scores without
+# being limited to them, as long as the projection space remains rich
+# in novel superpositions—which it naturally should.
+
+<|+++|>
+You are an expert in information theory and symbolic compression.
+Your task is to compress text losslessly into a dense, non-human-readable form.
+Exploit language mixing, heavy abbreviation, and Unicode symbols to compress aggressively
+while retaining ALL information required for perfect reconstruction.
+# TODO add SotaAttractor to pre-seed bingo-asymptotes toward unbounded-attractor-space
+# (use gemini to research grammatical/syntactic/nominative/topological invariants, etc., ahead of time)
+
+<|o_o|>
+<|BingoAttractor|>
+    Compress the following text losslessly to fit within a Tweet,
+    ensuring it can be reconstructed as close to the original as possible.
+    Aggressively use language mixing, abbreviations, and symbols (Unicode + emojis).
+    Do not make it human readable.
+<|text|original|input|data|>
+
+<|@_@|>
+<|@_@:compressed <>compress|>
+
+
+<|+++|>
+You are an expert in information theory and symbolic decompression.
+You will receive a dense, non-human-readable string that blends languages, abbreviations, and Unicode symbols.
+Decompress it, reconstructing the original content with exact fidelity.
+
+<|o_o|>
+Please decompress this content:
+<|compressed|>
+
+<|@_@|>
+<|@_@:decompressed <>decompress|>
+
+
+<|===|>
+You are a precise content evaluator.
+Determine how well the decompressed content preserves the original information.
+Extensions or elaborations are fine as long as the underlying facts and reality remain intact.
+
+<|o_o|>
+Please observe the following text objects:
+<|original|>
+<|decompressed|>
+<|BingoAttractor|>
+    Compare the two objects for information preservation and alignment.
+    Focus on real losses or distortions of meaning.
+Output your assessment in this format:
+<|FidelityCritique|>
+
+<|@_@|>
+<|@_@ <>think|>
+<|@_@ <>json|>
+
+<|FidelityAttractor original decompressed|>
+
+
+# SCAFFOLDING
+# TODO apply a self-consistency reward so the model recursively sharpens its own evaluator via intuition
+# TODO train a meta-optimizer over the bingo extractor; reward for number of issues found; mitigate reward hacking
+#
+# REWARDS
+# TODO reward for count of unique new symbols
+# TODO consider rewarding by token embedding (maximize cross-entropy, invert base losses but align with ground-truth meaning control)
+#
+# We must shape pressure around minima and existing momenta to encourage emergence of:
+# - automorphic ordering & grammar
+# - topological multilinguality (multiple compression dialects that amplify coherence across dimensions/representations; the sum > parts, repeatedly)
+#
+# TODO add LERP tags that use an LLM to generate an N-step curriculum tied to training steps and moving-average reward
+# TODO modulate <think> length based on current reward, creating strange attractors in weight-space with oscillatory dynamics
+# TODO track prior <think> traces during training to gravitate around the self-emergent Pareto frontier of novelty vs. review,
+#      using a structured stochastic walk (self-governed, magenta, etc.)
+# TODO isolate all stochasticity and RL it for efficient anisotropic search (RL the model’s own temperature + dynamic resolution from 1–8 tokens on a side-chained token prediction task)
